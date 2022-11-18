@@ -3,10 +3,11 @@ import './styles.css';
 
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 import { Logo } from '../../components/Logo';
+import { Input } from '../../components/Input';
 import { auth } from '../../services/firebaseConnection';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -23,6 +24,7 @@ export default function Login() {
 
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
+        toast.success('Bem vindo de volta :)')
         navigate('/admin', { replace: true })
       })
       .catch(() => {
@@ -37,13 +39,13 @@ export default function Login() {
       <Logo />
 
       <form className='form' onSubmit={handleLogin} >
-        <input
+        <Input
           type='email'
           placeholder='Digite seu email...'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <input
+        <Input
           type='password'
           placeholder='**********'
           autoComplete='on'
