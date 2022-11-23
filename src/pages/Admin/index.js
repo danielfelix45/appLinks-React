@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import './styles.css';
 import { Header } from '../../components/Header';
@@ -27,9 +27,41 @@ export default function Admin() {
   const [backgroundColorInput, setBackgroundColorInput] = useState('#f1f1f1');
   const [textColorInput, setTextColorInput] = useState('#121212');
 
+  // Criar useState para salvar a lista de links.
+  const [links, setLinks] = useState([]);
+
+  // Criar useEffect para buscar os dados no banco
+  useEffect(() => {
+
+    const linksRef = collection(db, 'links')
+    const queryRef = query(linksRef, orderBy('created', 'asc'))
+
+    const unsub = onSnapshot(queryRef, (snapshot) => {
+      let lista = [];
+
+      snapshot.forEach((doc) => {
+        lista.push({
+          id: doc.id,
+          name: doc.data().name,
+          url: doc.data().url,
+          bg: doc.data().bg,
+          color: doc.data().color,
+        })
+      })
+
+      setLinks(lista);
+    })
+
+  }, [])
+
+  // Função que registra os dados no banco.
   async function handleRegister(e) {
-    toast.warn('Preeencha todos os campos!')
     e.preventDefault();
+
+    if (nameInput === '' || urlInput === '') {
+      toast.warn('Preeencha todos os campos!')
+      return;
+    }
 
     addDoc(collection(db, 'links'), {
       name: nameInput,
@@ -47,7 +79,12 @@ export default function Admin() {
         console.log('ERRO AO REGISTRAR' + e)
         toast.error('Ops, erro ao salvar link!')
       })
+  }
 
+  // Função que deleta um link
+  async function handleDeleteLink(id) {
+    const deleteLink = doc(db, 'links', id)
+    deleteDoc(deleteLink)
   }
 
   return (
@@ -110,21 +147,24 @@ export default function Admin() {
         Meus links
       </h2>
 
-      <article
-        className='list animate-pop'
-        style={{ backgroundColor: '#000', color: '#fff' }}
-      >
-        <p>
-          Meus links
-        </p>
-        <div>
-          <button
-            className='btn-delete'>
-            <FiTrash2 size={18} color='#fff' />
-          </button>
+      {
+        links.map((item, index) => (
+          <article
+            key={index}
+            className='list animate-pop'
+            style={{ backgroundColor: item.bg, color: item.color }}
+          >
+            <p>{item.name}</p>
+            <div>
+              <button
+                className='btn-delete' onClick={() => handleDeleteLink(item.id)}>
+                <FiTrash2 size={18} color='#fff' />
+              </button>
+            </div>
+          </article>
+        ))
+      }
 
-        </div>
-      </article>
     </div>
   )
 }

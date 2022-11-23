@@ -1,43 +1,97 @@
+import { useState, useEffect } from 'react';
 import './styles.css';
 
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
-
 import { Social } from '../../components/Social';
 
+import { db } from '../../services/firebaseConnection';
+import { getDocs, collection, orderBy, query, getDoc, doc, } from 'firebase/firestore';
+
 export default function Home() {
+
+  const [links, setLinks] = useState([]);
+  const [socialLinks, setSocialLinks] = useState({});
+
+  useEffect(() => {
+
+    function loadLinks() {
+      const linksRef = collection(db, 'links')
+      const queryRef = query(linksRef, orderBy('created', 'asc'))
+
+      getDocs(queryRef)
+        .then((snapshot) => {
+          let lista = []
+
+          snapshot.forEach((docs) => {
+            lista.push({
+              id: docs.id,
+              name: docs.data().name,
+              url: docs.data().url,
+              bg: docs.data().bg,
+              color: docs.data().color,
+            })
+          })
+
+          setLinks(lista)
+        })
+    }
+
+    loadLinks()
+
+  }, [])
+
+  useEffect(() => {
+
+    function loadSocialLink() {
+      const docRef = doc(db, 'social', 'link')
+
+      getDoc(docRef)
+        .then((snapshot) => {
+
+          if (snapshot.data() !== undefined) {
+            setSocialLinks({
+              facebook: snapshot.data().facebook,
+              instagram: snapshot.data().instagram,
+              youtube: snapshot.data().youtube
+            })
+          }
+
+
+        })
+    }
+
+    loadSocialLink()
+
+  }, [])
+
   return (
     <div className='home-container'>
       <h1>Barbearia Félix</h1>
       <span>Veja meus links👇</span>
 
       <main className='links'>
-        <section className='link-area'>
-          <a href='#'>
-            <p className='link-text'>Nosso canal no Youtube</p>
-          </a>
-        </section>
-        <section className='link-area'>
-          <a href='#'>
-            <p className='link-text'>Grupo privado no Instagram</p>
-          </a>
-        </section>
-        <section className='link-area'>
-          <a href='#'>
-            <p className='link-text'>Nosso Blog</p>
-          </a>
-        </section>
 
-        <footer>
-          <Social url='https://facebook.com' >
-            <FaFacebook size={35} color='#fff' />
-          </Social>
-          <Social url='https://youtube.com' >
-            <FaYoutube size={35} color='#fff' />
-          </Social>
-          <Social url='https://instagram.com' >
-            <FaInstagram size={35} color='#fff' />
-          </Social>
-        </footer>
+        {links.map((item) => (
+          <section key={item.id} className='link-area' style={{ backgroundColor: item.bg }}>
+            <a href={item.url} target='blank'>
+              <p style={{ color: item.color }} className='link-text'>{item.name}</p>
+            </a>
+          </section>
+        ))}
+
+        {links.length !== 0 && Object.keys(socialLinks).length > 0 && (
+          <footer>
+            <Social url={socialLinks?.facebook} >
+              <FaFacebook size={35} color='#fff' />
+            </Social>
+            <Social url={socialLinks?.youtube} >
+              <FaYoutube size={35} color='#fff' />
+            </Social>
+            <Social url={socialLinks?.instagram} >
+              <FaInstagram size={35} color='#fff' />
+            </Social>
+          </footer>
+        )}
 
       </main>
     </div>
