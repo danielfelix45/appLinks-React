@@ -9,6 +9,22 @@
   justify-content: center;
 }
 
+.btn-login {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+  align-items: center;
+  justify-content: end;
+}
+
+.btn-login button {
+  font-size: 25px;
+  font-weight: bold;
+  background: transparent;
+  color: #fff;
+  border: none;
+}
+
 .home-container h1 {
   margin-bottom: 14px;
   color: #fff;

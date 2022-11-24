@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
-import './styles.css';
+import { useNavigate } from 'react-router-dom';
 
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
-import { Social } from '../../components/Social';
-
+import { AiOutlineArrowRight } from 'react-icons/ai';
 import { db } from '../../services/firebaseConnection';
 import { getDocs, collection, orderBy, query, getDoc, doc, } from 'firebase/firestore';
+
+import { Social } from '../../components/Social';
+import './styles.css';
 
 export default function Home() {
 
   const [links, setLinks] = useState([]);
   const [socialLinks, setSocialLinks] = useState({});
+
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -64,8 +68,16 @@ export default function Home() {
 
   }, [])
 
+  function toLogin() {
+    navigate('/login');
+  }
+
   return (
     <div className='home-container'>
+      <div className='btn-login' onClick={toLogin}>
+        <button>Login</button> <AiOutlineArrowRight size={30} color='#fff' />
+      </div >
+
       <h1>Barbearia Félix</h1>
       <span>Veja meus links👇</span>
 
@@ -94,6 +106,6 @@ export default function Home() {
         )}
 
       </main>
-    </div>
+    </div >
   )
 }

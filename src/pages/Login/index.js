@@ -3,6 +3,7 @@ import './styles.css';
 
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { AiOutlineArrowLeft } from 'react-icons/ai'
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 import { Logo } from '../../components/Logo';
@@ -34,8 +35,19 @@ export default function Login() {
 
   }
 
+  function ToHome() {
+    navigate('/')
+  }
+
   return (
     <div className='login-container' >
+      <div className='back-to-home' onClick={ToHome}>
+        <AiOutlineArrowLeft size={30} color='#fff' />
+        <button>
+          Home
+        </button>
+      </div>
+
       <Logo />
 
       <form className='form' onSubmit={handleLogin} >
